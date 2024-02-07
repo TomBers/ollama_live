@@ -1,0 +1,13 @@
+<div id="messages" phx-update="stream" class="flex-container">
+  <span :for={{dom_id, message} <- @streams.messages} class="text-item" id={dom_id}>
+    <%= Phoenix.HTML.raw(message.txt) %>
+  </span>
+</div>
+<br /><br />
+<button
+  id="send"
+  phx-click="run_model"
+  class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+>
+  Send
+</button>

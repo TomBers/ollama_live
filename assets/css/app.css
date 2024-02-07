@@ -1,0 +1,29 @@
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
+
+/* This file is for your main application CSS */
+
+.flex-container {
+    flex-wrap: wrap;
+    align-items: center;
+    /* Adjust the gap between items */
+}
+
+.text-item {
+    /* Styling for individual text items */
+    font-size: 1.2rem;
+
+    /* Light grey background */
+}
+
+.code_bloc {
+    /* Styling for code blocks */
+
+    background-color: #f0f0f0;
+    /* Light grey background */
+    border-radius: 5px;
+    font-family: monospace;
+    /* Monospace font */
+    /* Add horizontal scroll bar */
+}
