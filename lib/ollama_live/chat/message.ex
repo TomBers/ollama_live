@@ -4,6 +4,7 @@ defmodule OllamaLive.Chat.Message do
 
   schema "messages" do
     field :content, :string
+    field :system_prompt, :string
 
     timestamps(type: :utc_datetime)
   end
@@ -11,7 +12,7 @@ defmodule OllamaLive.Chat.Message do
   @doc false
   def changeset(message, attrs) do
     message
-    |> cast(attrs, [:content])
-    |> validate_required([:content])
+    |> cast(attrs, [:content, :system_prompt])
+    |> validate_required([:content, :system_prompt])
   end
 end

@@ -1,16 +1,32 @@
 defmodule OllamaLiveWeb.InterfaceLive.Index do
   use OllamaLiveWeb, :live_view
 
+  @system_prompt "You are a game desinger and developer of 2D games. You have experience as designer and a javascript developer."
+
   @impl true
   def mount(_params, _session, socket) do
-    socket = assign(socket, :start_of_code_block, true)
+    socket =
+      socket
+      |> assign(
+        form:
+          to_form(
+            OllamaLive.Chat.Message.changeset(%OllamaLive.Chat.Message{}, %{
+              content: "What is WebGL?",
+              system_prompt: @system_prompt
+            })
+          )
+      )
 
     {:ok, stream(socket, :messages, [])}
   end
 
   @impl true
-  def handle_event("run_model", _, socket) do
-    start_llm_run(self())
+  def handle_event(
+        "run_model",
+        %{"message" => %{"content" => prompt, "system_prompt" => system_prompt}},
+        socket
+      ) do
+    start_llm_run(self(), system_prompt, prompt)
     {:noreply, socket}
   end
 
@@ -18,27 +34,10 @@ defmodule OllamaLiveWeb.InterfaceLive.Index do
   def handle_info({:llm_response, txt}, socket) do
     id = Ecto.UUID.generate()
 
-    {txt, socket} =
-      if String.contains?(txt, "```") do
-        if socket.assigns.start_of_code_block do
-          {String.replace(txt, "```", "<code>"), assign(socket, :start_of_code_block, false)}
-        else
-          {String.replace(txt, "```", "</code>"), assign(socket, :start_of_code_block, true)}
-        end
-      else
-        {txt, socket}
-      end
-
-    {:noreply, stream_insert(socket, :messages, %{id: id, txt: txt})}
+    {:noreply, stream_insert(socket, :messages, %{id: id, txt: String.trim(txt)})}
   end
 
-  def start_llm_run(live_view_pid) do
-    sys_prompt =
-      "You are a game desinger and developer of 2D games. You have experience as designer and a javascript developer."
-
-    prompt =
-      "How can I make a GUI for my games?"
-
+  def start_llm_run(live_view_pid, sys_prompt, prompt) do
     prompt_with_setting = "[INST] <<SYS>>#{sys_prompt}<</SYS>>\n\n#{prompt} [/INST]"
 
     Task.start(fn ->

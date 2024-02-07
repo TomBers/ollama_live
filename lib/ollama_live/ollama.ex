@@ -1,6 +1,6 @@
 defmodule Ollama do
   @timeout 300_000
-  @batch_size 5
+  @batch_size 15
   @url "http://localhost:11434/api/generate"
 
   defp decode_body("", _), do: :ok
